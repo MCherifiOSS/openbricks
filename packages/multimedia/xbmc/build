@@ -138,6 +138,9 @@ fi
 
 # prevent internal error in gcc
 if [ ! -f configure ] ; then
+  # git version
+  echo "$PKG_URL_REV-$PKG_REV" > VERSION
+
   do_autoconf || true
   cd xbmc/screensavers/rsxs-0.9 && do_autoconf && cd -
   cd xbmc/visualizations/Goom/goom2k4-0 && do_autoconf && cd -
@@ -184,18 +187,23 @@ make externals
 make xbmc.bin
 make xbmc-xrandr
 make skins
-make_install
 
+make_install
+strip_bins .install/usr/lib/xbmc/ $install_dir_debug/usr/lib/debug
+
+
+# ToDo: Check if this is still needed...
 if [ "$TARGET_ARCH" = arm ]; then
   # workaround to make the addons run
-  ln -sf /usr/lib/xbmc/addons/library.xbmc.addon/libXBMC_addon-arm.so .install/usr/lib/xbmc/addons/library.xbmc.addon/libXBMC_addon-arm-linux.so || true
-  ln -sf /usr/lib/xbmc/addons/library.xbmc.gui/libXBMC_gui-arm.so .install/usr/lib/xbmc/addons/library.xbmc.gui/libXBMC_gui-arm-linux.so || true
-  ln -sf /usr/lib/xbmc/addons/library.xbmc.pvr/libXBMC_pvr-arm.so .install/usr/lib/xbmc/addons/library.xbmc.pvr/libXBMC_pvr-arm-linux.so || true
+  for i in .install/usr/lib/xbmc/addons/library.*/*arm.so; do
+    ln -sf $(basename $i) $(dirname $i)/$(basename $i .so)-linux.so
+  done
 fi
 
-for i in .install/usr/lib/xbmc/system/players/dvdplayer/*; do
+# ToDo: Check if this is really needed...
+for i in .install/usr/lib/xbmc/system/players/dvdplayer/*.so; do
   lib=$(basename $i)
-  ln -s /usr/lib/xbmc/system/players/dvdplayer/$lib .install/usr/lib/$lib;
+  ln -sf xbmc/system/players/dvdplayer/$lib .install/usr/lib/$lib
 done
 
 cp -P $ROOT/$PACKAGES/$PKG_SECTION/$1/scripts/xbmc-default-settings.sh \

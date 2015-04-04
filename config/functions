@@ -473,7 +473,7 @@ make_install () {
       rm -f $kmod_dir/build $kmod_dir/source $kmod_dir/modules.*
       strip_kmods "$kmod_dir" "$install_dir_debug/usr/lib/debug"
     fi
-    for b in bin sbin usr/bin usr/sbin usr/lib/xbmc lib/udev lib/systemd usr/libexec; do
+    for b in bin sbin usr/bin usr/sbin lib/udev lib/systemd usr/libexec; do
       [ -d "$install_dir/$b" ] && strip_bins "$install_dir/$b" "$install_dir_debug/usr/lib/debug"
     done
   fi
@@ -668,7 +668,7 @@ systemctl_enable () {
   target=`grep '^WantedBy' $target_dir/$unit | cut -f2 -d=`
   if [ -n "$target" ]; then
     mkdir -p ${target_dir}/lib/systemd/system/${target}.wants
-    ln -s $unit ${target_dir}/lib/systemd/system/${target}.wants/
+    ln -s ../$unit_name ${target_dir}/lib/systemd/system/${target}.wants/${unit_name}
   fi
 }
 
@@ -850,7 +850,7 @@ do_npm_install () {
       rm -f $kmod_dir/build $kmod_dir/source $kmod_dir/modules.*
       strip_kmods "$kmod_dir" "$install_dir_debug/usr/lib/debug"
     fi
-    for b in bin sbin usr/bin usr/sbin usr/lib/xbmc lib/udev lib/systemd usr/libexec; do
+    for b in bin sbin usr/bin usr/sbin lib/udev lib/systemd usr/libexec; do
       [ -d "$install_dir/$b" ] && strip_bins "$install_dir/$b" "$install_dir_debug/usr/lib/debug"
     done
   fi
@@ -868,7 +868,7 @@ set_title () {
 version_strip_minor() {
   version="$1"
   [ -z "$version" ] && version="$PKG_VERSION"
-  echo $version | sed 's/^\(.*\)\.[0-9]$/\1/'
+  echo $version | sed 's/^\(.*\)\.[0-9]*$/\1/'
 }
 
 # Usage: apply_series <package> <path/to/series/directory>
