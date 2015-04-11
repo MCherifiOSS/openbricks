@@ -670,6 +670,22 @@ systemctl_enable () {
     mkdir -p ${target_dir}/lib/systemd/system/${target}.wants
     ln -s ../$unit_name ${target_dir}/lib/systemd/system/${target}.wants/${unit_name}
   fi
+
+  target=`grep '^Alias' $target_dir/$unit | cut -f2 -d=`
+  for alias_name in $target; do
+    ln -s ${unit_name} ${target_dir}/lib/systemd/system/${alias_name}
+  done
+}
+
+# Usage: systemctl_mask <unit> [root_dir]
+systemctl_mask () {
+  local unit_name="$1"
+  local target_dir="$2"
+
+  [ -z "$target_dir" ] && target_dir=.install
+  
+  mkdir -p ${target_dir}/etc/systemd/system
+  ln -sf /dev/null ${target_dir}/etc/systemd/system/${unit_name}
 }
 
 do_python_strip () {
